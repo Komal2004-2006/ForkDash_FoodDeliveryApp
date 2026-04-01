@@ -1,0 +1,894 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Swisshy— Restaurants</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0d;
+      --surface: #161616;
+      --card: #1c1c1c;
+      --border: #2a2a2a;
+      --accent: #ff5c2b;
+      --accent2: #ffb347;
+      --text: #f0ede8;
+      --muted: #888;
+      --nav-h: 70px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: var(--nav-h);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+      background: rgba(13,13,13,0.92);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.55rem;
+      letter-spacing: -0.5px;
+      color: var(--text); text-decoration: none;
+    }
+    .nav-logo span { color: var(--accent); }
+
+    .nav-search {
+      flex: 1; max-width: 420px; margin: 0 32px;
+      position: relative;
+    }
+    .nav-search input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 10px 20px 10px 44px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .nav-search input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(255,92,43,0.15);
+    }
+    .nav-search input::placeholder { color: var(--muted); }
+    .search-icon {
+      position: absolute; left: 14px; top: 50%;
+      transform: translateY(-50%);
+      width: 16px; height: 16px;
+      color: var(--muted); pointer-events: none;
+    }
+
+    .nav-links { display: flex; align-items: center; gap: 6px; }
+    .nav-links a {
+      display: flex; align-items: center; gap: 7px;
+      padding: 8px 16px; border-radius: 50px;
+      color: var(--muted); text-decoration: none;
+      font-size: 0.88rem; font-weight: 500;
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-links a:hover { background: var(--surface); color: var(--text); }
+    .nav-links a.active { color: var(--accent); }
+
+    .cart-link {
+      position: relative;
+      background: var(--accent) !important;
+      color: #fff !important;
+      font-weight: 600 !important;
+    }
+    .cart-link:hover { background: #e04d22 !important; }
+    .cart-badge {
+      position: absolute; top: -5px; right: -5px;
+      background: var(--accent2); color: #000;
+      font-size: 0.65rem; font-weight: 700;
+      width: 18px; height: 18px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      margin-top: var(--nav-h);
+      padding: 56px 32px 40px;
+      background: linear-gradient(135deg, #1a1008 0%, #0d0d0d 60%);
+      border-bottom: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -80px; right: -80px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(255,92,43,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-inner { max-width: 1200px; margin: 0 auto; }
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.1; margin-bottom: 10px;
+    }
+    .hero h1 em { color: var(--accent); font-style: normal; }
+    .hero p { color: var(--muted); font-size: 1rem; margin-bottom: 28px; }
+
+    .filters { display: flex; flex-wrap: wrap; gap: 10px; }
+    .chip {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      color: var(--muted);
+      font-size: 0.82rem; font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .chip:hover { border-color: var(--accent); color: var(--text); }
+    .chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    /* ── SORT BAR ── */
+    .sort-bar {
+      max-width: 1200px; margin: 0 auto 24px;
+      padding: 20px 32px 0;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .sort-bar span { color: var(--muted); font-size: 0.88rem; }
+    .sort-bar span strong { color: var(--text); }
+    .sort-select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 7px 14px; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem; outline: none; cursor: pointer;
+    }
+
+    /* ── GRID ── */
+    .grid-wrap { max-width: 1200px; margin: 0 auto; padding: 0 32px 60px; }
+    .restaurants-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 24px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+      animation: fadeUp 0.5s both;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      border-color: rgba(255,92,43,0.3);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card:nth-child(1)  { animation-delay: 0.03s }
+    .card:nth-child(2)  { animation-delay: 0.06s }
+    .card:nth-child(3)  { animation-delay: 0.09s }
+    .card:nth-child(4)  { animation-delay: 0.12s }
+    .card:nth-child(5)  { animation-delay: 0.15s }
+    .card:nth-child(6)  { animation-delay: 0.18s }
+    .card:nth-child(7)  { animation-delay: 0.21s }
+    .card:nth-child(8)  { animation-delay: 0.24s }
+    .card:nth-child(9)  { animation-delay: 0.27s }
+    .card:nth-child(10) { animation-delay: 0.30s }
+    .card:nth-child(11) { animation-delay: 0.33s }
+    .card:nth-child(12) { animation-delay: 0.36s }
+    .card:nth-child(13) { animation-delay: 0.39s }
+    .card:nth-child(14) { animation-delay: 0.42s }
+    .card:nth-child(15) { animation-delay: 0.45s }
+    .card:nth-child(16) { animation-delay: 0.48s }
+    .card:nth-child(17) { animation-delay: 0.51s }
+    .card:nth-child(18) { animation-delay: 0.54s }
+    .card:nth-child(19) { animation-delay: 0.57s }
+    .card:nth-child(20) { animation-delay: 0.60s }
+
+    .card-img-wrap {
+      position: relative; overflow: hidden; height: 190px;
+    }
+    .card-img-wrap img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.4s;
+      display: block;
+    }
+    .card:hover .card-img-wrap img { transform: scale(1.06); }
+
+    .card-tag {
+      position: absolute; top: 12px; left: 12px;
+      background: rgba(13,13,13,0.82);
+      backdrop-filter: blur(8px);
+      padding: 4px 10px; border-radius: 50px;
+      font-size: 0.72rem; font-weight: 600; color: var(--text);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .card-offer {
+      position: absolute; top: 12px; right: 12px;
+      background: var(--accent);
+      padding: 4px 10px; border-radius: 50px;
+      font-size: 0.72rem; font-weight: 700; color: #fff;
+    }
+    .card-closed-overlay {
+      position: absolute; inset: 0;
+      background: rgba(13,13,13,0.65);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.4rem;
+      letter-spacing: 4px; color: var(--muted);
+    }
+
+    .card-body { padding: 16px 18px 18px; }
+
+    .card-top {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 10px;
+      margin-bottom: 6px;
+    }
+    .card-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 1.05rem; line-height: 1.2;
+    }
+    .card-cuisine {
+      font-size: 0.78rem; color: var(--muted); margin-top: 2px;
+    }
+    .rating {
+      display: flex; align-items: center; gap: 4px;
+      background: #1a3a1a; padding: 4px 9px;
+      border-radius: 8px; flex-shrink: 0;
+    }
+    .rating-star { color: #4caf50; font-size: 0.75rem; }
+    .rating-val { color: #4caf50; font-size: 0.82rem; font-weight: 700; }
+
+    .card-desc {
+      color: var(--muted); font-size: 0.83rem;
+      line-height: 1.5; margin-bottom: 14px;
+      display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+
+    .card-meta {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+    .meta-items { display: flex; gap: 16px; }
+    .meta-item {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.8rem; color: var(--muted);
+    }
+    .meta-icon { font-size: 0.85rem; }
+    .meta-item strong { color: var(--text); font-weight: 500; }
+
+    .order-btn {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff; text-decoration: none;
+      padding: 8px 16px; border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem; font-weight: 600;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .order-btn:hover { background: #e04d22; transform: scale(0.97); }
+
+    .closed-text { font-size: 0.78rem; color: var(--muted); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      nav { padding: 0 16px; }
+      .nav-search { display: none; }
+      .nav-links a span { display: none; }
+      .hero { padding: 40px 16px 28px; }
+      .sort-bar, .grid-wrap { padding-left: 16px; padding-right: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAVBAR ══ -->
+<nav>
+  <a class="nav-logo" href="#">Fork<span>Dash</span></a>
+
+  <div class="nav-search">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input type="text" placeholder="Search restaurants, cuisines…"/>
+  </div>
+
+  <div class="nav-links">
+    <a href="#" class="active">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Home</span>
+    </a>
+    <a href="#" class="cart-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span>Cart</span>
+      <span class="cart-badge">3</span>
+    </a>
+    <a href="#">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>Profile</span>
+    </a>
+    <a href="#">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      <span>Login</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-inner">
+    <h1>Hungry? We've got<br><em>20 spots</em> for you.</h1>
+    <p>Fast delivery · Fresh food · Great deals in Bengaluru</p>
+    <div class="filters">
+      <a href="#" class="chip active">All</a>
+      <a href="#" class="chip">🍕 Pizza</a>
+      <a href="#" class="chip">🍔 Burgers</a>
+      <a href="#" class="chip">🍣 Sushi</a>
+      <a href="#" class="chip">🍜 Asian</a>
+      <a href="#" class="chip">🥗 Healthy</a>
+      <a href="#" class="chip">🌮 Mexican</a>
+      <a href="#" class="chip">🍛 Indian</a>
+      <a href="#" class="chip">☕ Cafe</a>
+      <a href="#" class="chip">⭐ Top Rated</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SORT BAR ══ -->
+<div class="sort-bar">
+  <span>Showing <strong>20 restaurants</strong> near you</span>
+  <select class="sort-select">
+    <option>Sort: Relevance</option>
+    <option>Rating: High to Low</option>
+    <option>Delivery Time</option>
+    <option>Cost: Low to High</option>
+  </select>
+</div>
+
+<!-- ══ GRID ══ -->
+<div class="grid-wrap">
+  <div class="restaurants-grid">
+
+    <!-- Card 1 -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&q=80" alt="Smoke & Bun" loading="lazy"/>
+        <span class="card-tag">Trending</span>
+        <span class="card-offer">20% OFF</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">Smoke &amp; Bun</div>
+            <div class="card-cuisine">American · Burgers</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.7</span></div>
+        </div>
+        <div class="card-desc">Smash burgers loaded with house-made sauces, crispy bacon, and double-stacked patties that drip goodness.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>18–25 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>Koramangala</strong></div>
+          </div>
+          <a href="#" class="order-btn">Order Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600&q=80" alt="Sakura Tokyo" loading="lazy"/>
+        <span class="card-tag">Top Rated</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">Sakura Tokyo</div>
+            <div class="card-cuisine">Japanese · Sushi</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.8</span></div>
+        </div>
+        <div class="card-desc">Authentic omakase-style sushi rolls and ramen bowls crafted by a chef trained in Osaka for 12 years.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>25–35 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>Indiranagar</strong></div>
+          </div>
+          <a href="#" class="order-btn">Order Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=600&q=80" alt="Punjab da Dhaba" loading="lazy"/>
+        <span class="card-tag">Popular</span>
+        <span class="card-offer">Free Naan</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">Punjab da Dhaba</div>
+            <div class="card-cuisine">Indian · Punjabi</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.5</span></div>
+        </div>
+        <div class="card-desc">Rich butter chicken, silky dals, and tandoori breads that bring the roadside dhaba vibe to your door.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>20–30 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>HSR Layout</strong></div>
+          </div>
+          <a href="#" class="order-btn">Order Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&q=80" alt="Verde Kitchen" loading="lazy"/>
+        <span class="card-tag">New</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">Verde Kitchen</div>
+            <div class="card-cuisine">Healthy · Salads</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.6</span></div>
+        </div>
+        <div class="card-desc">Cold-pressed juices, grain bowls, and macro-friendly meals designed by nutritionists. Feel good food.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>22–32 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>Whitefield</strong></div>
+          </div>
+          <a href="#" class="order-btn">Order Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80" alt="Pizza Republik" loading="lazy"/>
+        <span class="card-tag">Best Seller</span>
+        <span class="card-offer">15% OFF</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">Pizza Republik</div>
+            <div class="card-cuisine">Italian · Pizza</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.4</span></div>
+        </div>
+        <div class="card-desc">Wood-fired Neapolitan pizzas with San Marzano tomatoes and hand-stretched dough charred to perfection.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>30–40 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>Jayanagar</strong></div>
+          </div>
+          <a href="#" class="order-btn">Order Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 6 -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1563245372-f21724e3856d?w=600&q=80" alt="Wok On Fire" loading="lazy"/>
+        <span class="card-tag">Spicy 🌶️</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">Wok On Fire</div>
+            <div class="card-cuisine">Chinese · Asian</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.3</span></div>
+        </div>
+        <div class="card-desc">Street-style dim sums, kung pao noodles, and fiery Sichuan wok dishes served blazing hot.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>20–28 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>MG Road</strong></div>
+          </div>
+          <a href="#" class="order-btn">Order Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 7 -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=600&q=80" alt="Bella Pasta" loading="lazy"/>
+        <span class="card-tag">Fan Fav</span>
+        <span class="card-offer">Buy 2 Get 1</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">Bella Pasta</div>
+            <div class="card-cuisine">Italian · Pasta</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.7</span></div>
+        </div>
+        <div class="card-desc">Fresh handmade pasta tossed in slow-cooked ragù, truffle cream, and pesto from Ligurian basil.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>28–38 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>Richmond Town</strong></div>
+          </div>
+          <a href="#" class="order-btn">Order Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 8 -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600&q=80" alt="Taco Fiesta" loading="lazy"/>
+        <span class="card-tag">Trending</span>
+        <span class="card-offer">30% OFF</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">Taco Fiesta</div>
+            <div class="card-cuisine">Mexican · Tacos</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.5</span></div>
+        </div>
+        <div class="card-desc">Birria tacos, cheesy quesadillas, and loaded nachos with house-made guac that slaps every time.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>15–22 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>BTM Layout</strong></div>
+          </div>
+          <a href="#" class="order-btn">Order Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 9 -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=600&q=80" alt="The Grill House" loading="lazy"/>
+        <span class="card-tag">Premium</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">The Grill House</div>
+            <div class="card-cuisine">BBQ · Steaks</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.8</span></div>
+        </div>
+        <div class="card-desc">Prime-cut steaks and slow-smoked ribs over hickory wood — carnivore heaven delivered to your door.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>35–45 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>Sadashivanagar</strong></div>
+          </div>
+          <a href="#" class="order-btn">Order Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 10 -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80" alt="Café Nimbus" loading="lazy"/>
+        <span class="card-tag">Cozy ☕</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">Café Nimbus</div>
+            <div class="card-cuisine">Café · Desserts</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.6</span></div>
+        </div>
+        <div class="card-desc">Artisan single-origin coffee, cloud-soft soufflé pancakes, and seasonal pastries. Weekend brunch favourite.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>20–28 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>Lavelle Road</strong></div>
+          </div>
+          <a href="#" class="order-btn">Order Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 11 -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1701579231305-d84d8af9a3fd?w=600&q=80" alt="Biryani Bros" loading="lazy"/>
+        <span class="card-tag">🔥 Hot</span>
+        <span class="card-offer">Combo Deal</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">Biryani Bros</div>
+            <div class="card-cuisine">Indian · Biryani</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.7</span></div>
+        </div>
+        <div class="card-desc">Dum-cooked Hyderabadi biryani with saffron-soaked rice, whole spices, and melt-in-mouth meat.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>25–35 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>Electronic City</strong></div>
+          </div>
+          <a href="#" class="order-btn">Order Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 12 -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1590301157890-4810ed352733?w=600&q=80" alt="Seoul Bowl" loading="lazy"/>
+        <span class="card-tag">New</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">Seoul Bowl</div>
+            <div class="card-cuisine">Korean · BBQ</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.5</span></div>
+        </div>
+        <div class="card-desc">Korean fried chicken, bibimbap bowls, and gochujang marinated skewers that transport you to Itaewon.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>22–32 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>Domlur</strong></div>
+          </div>
+          <a href="#" class="order-btn">Order Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 13 -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=80" alt="Mezze & More" loading="lazy"/>
+        <span class="card-tag">Veg Friendly</span>
+        <span class="card-offer">10% OFF</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">Mezze &amp; More</div>
+            <div class="card-cuisine">Mediterranean · Wraps</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.4</span></div>
+        </div>
+        <div class="card-desc">Falafel wraps, hummus platters, and shawarmas with house-pickled veggies and tahini drizzle.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>18–26 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>Cunningham Rd</strong></div>
+          </div>
+          <a href="#" class="order-btn">Order Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 14 -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=600&q=80" alt="Pho & Friends" loading="lazy"/>
+        <span class="card-tag">Light Eats</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">Pho &amp; Friends</div>
+            <div class="card-cuisine">Vietnamese · Noodles</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.3</span></div>
+        </div>
+        <div class="card-desc">Steaming bowls of bone-broth pho with hand-rolled spring rolls and lemongrass-kissed banh mi.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>20–30 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>Banaswadi</strong></div>
+          </div>
+          <a href="#" class="order-btn">Order Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 15 -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=80" alt="The Pancake Lab" loading="lazy"/>
+        <span class="card-tag">Brunch Hit</span>
+        <span class="card-offer">Free Drink</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">The Pancake Lab</div>
+            <div class="card-cuisine">Breakfast · Sweet</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.6</span></div>
+        </div>
+        <div class="card-desc">Towering Japanese soufflé pancakes, eggs benedict, and matcha waffles — breakfast all day long.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>15–22 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>Malleshwaram</strong></div>
+          </div>
+          <a href="#" class="order-btn">Order Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 16 -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80" alt="Crust & Co." loading="lazy"/>
+        <span class="card-tag">Fresh Daily</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">Crust &amp; Co.</div>
+            <div class="card-cuisine">Bakery · Sandwiches</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.5</span></div>
+        </div>
+        <div class="card-desc">Slow-fermented sourdough, brioche French toast, and gourmet deli sandwiches stacked generously.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>18–25 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>JP Nagar</strong></div>
+          </div>
+          <a href="#" class="order-btn">Order Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 17 -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&q=80" alt="Spice Trail" loading="lazy"/>
+        <span class="card-tag">Pure Veg</span>
+        <span class="card-offer">25% OFF</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">Spice Trail</div>
+            <div class="card-cuisine">Indian · South Indian</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.7</span></div>
+        </div>
+        <div class="card-desc">Crispy masala dosas, fluffy idlis, and piping hot sambar that remind you of home-cooked Sunday mornings.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>15–20 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>Basavanagudi</strong></div>
+          </div>
+          <a href="#" class="order-btn">Order Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 18 -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=600&q=80" alt="Burrito Barn" loading="lazy"/>
+        <span class="card-tag">Value Picks</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">Burrito Barn</div>
+            <div class="card-cuisine">Tex-Mex · Wraps</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.3</span></div>
+        </div>
+        <div class="card-desc">Overstuffed burritos and bowls loaded with cilantro rice, pulled pork, and three-chilli salsa.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>22–30 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>Sarjapur</strong></div>
+          </div>
+          <a href="#" class="order-btn">Order Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 19 — Closed -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80" alt="Ember & Oak" loading="lazy"/>
+        <span class="card-tag">⭐ Elite</span>
+        <div class="card-closed-overlay">CLOSED</div>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">Ember &amp; Oak</div>
+            <div class="card-cuisine">Continental · Fine Dining</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.9</span></div>
+        </div>
+        <div class="card-desc">Slow-roasted lamb shoulder, duck confit, and molten chocolate lava cake. Elevated comfort dining.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>40–55 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>UB City</strong></div>
+          </div>
+          <span class="closed-text">Opens at 5 PM</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 20 -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=600&q=80" alt="Mango Leaf" loading="lazy"/>
+        <span class="card-tag">Coastal</span>
+        <span class="card-offer">New User Deal</span>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">Mango Leaf</div>
+            <div class="card-cuisine">Indian · Kerala</div>
+          </div>
+          <div class="rating"><span class="rating-star">★</span><span class="rating-val">4.6</span></div>
+        </div>
+        <div class="card-desc">Appam and stew, fish curry, and Kerala prawn biryani cooked in traditional earthen vessels with coconut milk.</div>
+        <div class="card-meta">
+          <div class="meta-items">
+            <div class="meta-item"><span class="meta-icon">🕐</span><strong>28–38 min</strong></div>
+            <div class="meta-item"><span class="meta-icon">📍</span><strong>Cox Town</strong></div>
+          </div>
+          <a href="#" class="order-btn">Order Now</a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /grid -->
+</div><!-- /wrap -->
+
+</body>
+</html>
