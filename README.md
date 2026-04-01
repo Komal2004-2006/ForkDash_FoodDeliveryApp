@@ -155,7 +155,7 @@ Eclipse IDE (Dynamic Web Project)
 
 Steps
 1. Clone the repository
-git clone https://github.com/yourusername/forkdash.git
+git clone https://github.com/komal2004-2006/forkdash_FoodDeliveryApp.git
 
 2. Import into Eclipse
 File → Import → Existing Projects into Workspace → Select folder
