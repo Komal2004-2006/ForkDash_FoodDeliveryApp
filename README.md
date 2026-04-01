@@ -184,7 +184,7 @@ Prerequisites
 # Steps
 
 1. Clone the repository**
-git clone https://github.com/yourusername/forkdash.git
+git clone https://github.com/Komal2004-2006/ForkDash_FoodDeliveryApp.git
 
 2. Import into Eclipse**
 File → Import → Existing Projects into Workspace → Select folder
